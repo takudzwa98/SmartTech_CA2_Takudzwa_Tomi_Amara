@@ -142,7 +142,7 @@ def batch_generator(image_paths, steering_ang, batch_size, is_training):
         yield (np.asarray(batch_img), np.asarray(batch_steering))
 
 
-datadir = 'C:\\Users\\smell\\Documents\\beta_simulator_windows\\BCData'
+datadir = 'C:\\Users\\amara\Desktop\\beta_simulator_windows\\ABCDATA'
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'reverse', 'speed']
 data = pd.read_csv(os.path.join(datadir, 'driving_log.csv'), names = columns)
 pd.set_option('max_columns', 7)
@@ -152,14 +152,15 @@ print(data.head())
 data['center'] = data['center'].apply(path_leaf)
 data['left'] = data['left'].apply(path_leaf)
 data['right'] = data['right'].apply(path_leaf)
+print('Total Images Imported', data.shape[0])
 
-num_bins = 25
-samples_per_bin = 210
+num_bins = 31
+samples_per_bin = 1000
 hist, bins = np.histogram(data['steering'], num_bins)
 print(bins)
 center = (bins[:-1] + bins[1:])*0.5
 plt.bar(center, hist, width=0.05)
-plt.plot((np.min(data['steering']), np.max(data['steering'])), (samples_per_bin, samples_per_bin))
+plt.plot((np.min(data['steering']), np.max(data['steering'])), (np.min(data['speed']), np.max(data['speed'])), (samples_per_bin, samples_per_bin))
 plt.show()
 
 print('Total data: ', len(data))
@@ -220,7 +221,7 @@ plt.show()
 #X_train = np.array(list(map(img_preprocess, X_train)))
 #X_valid = np.array(list(map(img_preprocess, X_valid)))
 
-image = image_paths[random.randint(0, 1000)]
+image = image_paths[random.randint(0, 6000)]
 original_image = mpimg.imread(image)
 zoomed_image = zoom(original_image)
 fig, axs = plt.subplots(1, 2, figsize=(15, 10))
@@ -231,7 +232,7 @@ axs[1].imshow(zoomed_image)
 axs[1].set_title("Zoomed Image")
 plt.show()
 
-image = image_paths[random.randint(0, 1000)]
+image = image_paths[random.randint(0, 4000)]
 original_image = mpimg.imread(image)
 panned_image = pan(original_image)
 fig, axs = plt.subplots(1, 2, figsize=(15, 10))
@@ -242,7 +243,7 @@ axs[1].imshow(panned_image)
 axs[1].set_title("Panned Image")
 plt.show()
 
-image = image_paths[random.randint(0, 1000)]
+image = image_paths[random.randint(0, 4000)]
 original_image = mpimg.imread(image)
 bright_image = img_random_brightness(original_image)
 fig, axs = plt.subplots(1, 2, figsize=(15, 10))
@@ -286,8 +287,8 @@ plt.show()
 model = nvidia_model()
 print(model.summary())
 
-h = model.fit(batch_generator(X_train, y_train, 100, 1),                           steps_per_epoch=100,
-                        epochs=20,
+h = model.fit(batch_generator(X_train, y_train, 100, 1),                           steps_per_epoch=300,
+                        epochs=10,
                         validation_data=batch_generator(X_valid, y_valid, 100, 0),
                         validation_steps=200,
                         verbose=1,
